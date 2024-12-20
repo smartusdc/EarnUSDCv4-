@@ -3,41 +3,147 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Earn USDC rewards on Base network" />
-    <title>EarnUSDC on Base</title>
+    <meta name="description" content="Earn high APR on your USDC deposits on Base Network" />
+    <meta name="theme-color" content="#3B82F6" />
+    <title>EarnUSDC | High Yield USDC Deposits on Base</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://mainnet.base.org" />
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" />
     
     <!-- External Dependencies -->
     <script src="https://cdn.tailwindcss.com?v=3.4.1"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.2/web3.min.js" integrity="sha512-nFoXwnw/HJ3sG+o3PuO+l9yf25tlxAJKjiWU3H7msFuA2ez2aA38qWHEeZ1z0OhHDqf2HSHWi8lcQ4lR6TJGA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     
+    <!-- Tailwind Configuration -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              base: {
+                blue: '#0052FF',
+                black: '#0A0B0D'
+              }
+            }
+          }
+        }
+      }
+    </script>
+    
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="style.css">
+    <style>
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #666;
+      }
+      
+      /* Number input styles */
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        opacity: 1;
+      }
+      
+      /* Alert animations */
+      .alert {
+        animation: slideIn 0.3s ease-out;
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateY(-100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      
+      /* Loading spinner animation */
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .animate-spin {
+        animation: spin 1s linear infinite;
+      }
+    </style>
   </head>
-  <body>
-    <div id="root">
-      <div class="min-h-screen bg-gray-50 py-8">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6">
-            <h1 class="text-2xl font-bold mb-4">EarnUSDC on Base</h1>
-            <div id="mainContent">
-              <!-- Dynamic content will be rendered here -->
-              <div class="flex justify-center items-center p-4">
+  <body class="bg-gray-50">
+    <!-- App Container -->
+    <div id="root" class="min-h-screen">
+      <div class="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <header class="mb-8">
+          <div class="flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-base-black">EarnUSDC</h1>
+            <div class="flex items-center space-x-4">
+              <a 
+                href="https://basescan.org/address/0x9cf81A1814D452D4f5308aA38D128ce5CAADdDE4" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                Contract
+              </a>
+              <a 
+                href="https://docs.base.org" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                About Base
+              </a>
+            </div>
+          </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+          <!-- Card Container -->
+          <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Alert Container -->
+            <div id="alertContainer" class="sticky top-0 z-10"></div>
+            
+            <!-- Main Content Area -->
+            <div id="mainContent" class="p-4 sm:p-6">
+              <div class="flex justify-center items-center">
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
               </div>
             </div>
           </div>
-        </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-sm text-gray-500">
+          <p>Built on Base Network</p>
+        </footer>
       </div>
     </div>
 
-    <!-- Error boundary -->
-    <div id="errorBoundary" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <!-- Error Boundary -->
+    <div id="errorBoundary" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white p-6 rounded-lg max-w-md mx-4">
         <h2 class="text-xl font-bold text-red-600 mb-2">Error</h2>
         <p id="errorMessage" class="text-gray-700 mb-4"></p>
-        <button onclick="window.location.reload()" class="w-full bg-blue-500 text-white rounded px-4 py-2">
-          Reload Page
+        <button 
+          onclick="window.location.reload()" 
+          class="w-full bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 transition-colors"
+        >
+          Reload Application
         </button>
       </div>
     </div>
@@ -50,13 +156,14 @@
     <script>
       // Global error handler
       window.onerror = function(msg, src, line, col, error) {
-        console.error('Global error:', error);
-        document.getElementById('errorMessage').textContent = 'An unexpected error occurred. Please reload the page.';
+        console.error('Global error:', { msg, src, line, col, error });
+        document.getElementById('errorMessage').textContent = 
+          'An unexpected error occurred. Please reload the application.';
         document.getElementById('errorBoundary').classList.remove('hidden');
         return false;
       };
 
-      // Setup MetaMask event listeners
+      // MetaMask event listeners
       if (window.ethereum) {
         window.ethereum.on('accountsChanged', function (accounts) {
           if (accounts.length === 0) {
@@ -79,16 +186,25 @@
           renderUI();
         });
 
-        // Check if we're on the correct network
+        // Check network on load
         ethereum.request({ method: 'eth_chainId' })
           .then(chainId => {
-            if (chainId !== '0x2105') { // Base Mainnet
-              showAlert('Please switch to Base network', 'error');
+            if (chainId !== CHAIN_CONFIG.chainId) {
+              showAlert('Please switch to Base Network to continue', 'error');
             }
-          });
+          })
+          .catch(console.error);
+
       } else {
         showAlert('Please install MetaMask to use this application', 'error');
       }
+
+      // Initialize Lucide icons when DOM is ready
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.lucide) {
+          lucide.createIcons();
+        }
+      });
     </script>
   </body>
 </html>

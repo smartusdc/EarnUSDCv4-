@@ -115,11 +115,12 @@ window.CHAIN_CONFIG = {
   iconUrls: ["https://raw.githubusercontent.com/ethereum-optimism/brand-kit/main/assets/svg/Base_Network_Logo.svg"]
 };
 
-// Application constants
+// config.js - MAX_DECIMALSの更新
+
 window.APP_CONSTANTS = {
-  REWARD_UPDATE_INTERVAL: 60 * 1000, // 1 minute in milliseconds
-  ALERT_DURATION: 5000,              // 5 seconds
-  MAX_DECIMALS: 6,                   // Maximum decimal places for USDC
-  GAS_LIMIT_BUFFER: 1.1,             // 10% buffer for gas limit
-  DEFAULT_GAS_PRICE: '100'           // Fallback gas price
+  REWARD_UPDATE_INTERVAL: 60 * 1000,    // 1分（変更なし）
+  ALERT_DURATION: 5000,                 // 5秒（変更なし）
+  MAX_DECIMALS: 4,                      // 小数点以下4桁に変更（0.0001単位）
+  GAS_LIMIT_BUFFER: 1.2,                // 20%（変更なし）
+  DEFAULT_GAS_PRICE: '100'              // 維持
 };

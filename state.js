@@ -4,14 +4,13 @@ window.updateUI = async function() {
 
   try {
     setLoading(true);
-    const [balance, apr, depositReward, referralReward, userReferral, usdcBalance, withdrawalRequest] = await Promise.all([
+    const [balance, apr, depositReward, referralReward, userReferral, usdcBalance] = await Promise.all([
       contract.methods.deposits(currentAccount).call(),
       contract.methods.currentAPR().call(),
       contract.methods.calculateReward(currentAccount).call(),
       contract.methods.referralRewards(currentAccount).call(),
       contract.methods.userReferrals(currentAccount).call(),
-      usdcContract.methods.balanceOf(currentAccount).call(),
-      contract.methods.withdrawalRequests(currentAccount).call()
+      usdcContract.methods.balanceOf(currentAccount).call()
     ]);
 
     window.state = {
@@ -21,8 +20,7 @@ window.updateUI = async function() {
       depositReward: (depositReward / 1e6).toFixed(APP_CONSTANTS.MAX_DECIMALS),
       referralReward: (referralReward / 1e6).toFixed(APP_CONSTANTS.MAX_DECIMALS),
       usdcBalance: (usdcBalance / 1e6).toFixed(APP_CONSTANTS.MAX_DECIMALS),
-      referralCode: userReferral.referralCode || '',
-      pendingWithdrawal: withdrawalRequest
+      referralCode: userReferral.referralCode || ''
     };
 
     renderUI();
@@ -55,17 +53,5 @@ window.updateRewards = async function() {
   } catch (error) {
     console.error('Reward update error:', error);
     // エラーは表示せず、次の更新を待つ
-  }
-}
-
-window.updatePendingWithdrawal = async function() {
-  if (!currentAccount || !contract) return;
-  
-  try {
-    const withdrawalRequest = await contract.methods.withdrawalRequests(currentAccount).call();
-    window.state.pendingWithdrawal = withdrawalRequest;
-    updatePendingWithdrawalUI();
-  } catch (error) {
-    console.error('Withdrawal update error:', error);
   }
 }

@@ -150,15 +150,28 @@
     <script src="transaction.js"></script>
     <script src="ui.js"></script>
 
-    <script>
-      // Global error handler
-      window.onerror = function(msg, src, line, col, error) {
-        console.error('Global error:', { msg, src, line, col, error });
-        document.getElementById('errorMessage').textContent = 
-          'An unexpected error occurred. Please reload the application.';
-        document.getElementById('errorBoundary').classList.remove('hidden');
-        return false;
-      };
-    </script>
+<!-- index.html の該当部分を変更 -->
+<script>
+  // Global error handler
+  window.onerror = function(msg, src, line, col, error) {
+    console.error('Global error:', { msg, src, line, col, error });  // この行はそのまま
+    
+    // エラーメッセージをより詳細に
+    document.getElementById('errorMessage').textContent = 
+      `Error: ${msg}\nLine: ${line}\nSource: ${src}`;
+    document.getElementById('errorBoundary').classList.remove('hidden');
+    return false;
+  };
+
+  // DOMContentLoadedのエラーもキャッチ
+  document.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('unhandledrejection', function(event) {
+      console.error('Unhandled promise rejection:', event.reason);
+      document.getElementById('errorMessage').textContent = 
+        `Async Error: ${event.reason}`;
+      document.getElementById('errorBoundary').classList.remove('hidden');
+    });
+  });
+</script>
   </body>
 </html>

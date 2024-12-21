@@ -124,3 +124,22 @@ window.APP_CONSTANTS = {
   GAS_LIMIT_BUFFER: 1.2,                // 20%（変更なし）
   DEFAULT_GAS_PRICE: '100'              // 維持
 };
+
+// Initial application state
+window.state = {
+  balance: '0.0000',
+  apr: '0',
+  referralCode: '',
+  depositReward: '0.0000',
+  referralReward: '0.0000',
+  isWalletConnected: false,
+  isLoading: false,
+  usdcBalance: '0.0000'
+};
+
+// Global variables
+window.web3 = null;
+window.contract = null;
+window.usdcContract = null;
+window.currentAccount = '';
+window.rewardUpdateInterval = null;

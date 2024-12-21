@@ -70,25 +70,46 @@ window.renderDepositSection = function() {
       </div>
       <div class="p-4 bg-gray-50 rounded-lg">
         <h3 class="font-bold mb-2">Withdraw USDC</h3>
-        <div class="flex gap-2 mb-2">
-          <input 
-            type="number" 
-            id="withdrawAmount" 
-            placeholder="Amount" 
-            step="0.0001"
-            min="0.0001"
-            class="flex-1 p-2 border rounded focus:ring-2 focus:ring-blue-500"
-            ${state.isLoading ? 'disabled' : ''}
-          />
-          <button 
-            onclick="handleWithdraw()"
-            class="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            ${state.isLoading ? 'disabled' : ''}
-          >
-            ${state.isLoading ? 'Processing...' : 'Withdraw'}
-          </button>
+        <div class="flex flex-col gap-2">
+          <div class="flex gap-2 mb-2">
+            <input 
+              type="number" 
+              id="withdrawAmount" 
+              placeholder="Amount" 
+              step="0.0001"
+              min="0.0001"
+              class="flex-1 p-2 border rounded focus:ring-2 focus:ring-blue-500"
+              ${state.isLoading ? 'disabled' : ''}
+            />
+            <button 
+              onclick="handleWithdraw()"
+              class="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              ${state.isLoading ? 'disabled' : ''}
+            >
+              ${state.isLoading ? 'Processing...' : 'Request Withdrawal'}
+            </button>
+          </div>
+          <div id="pendingWithdrawal" style="display: none;" class="mt-2 p-2 bg-yellow-50 rounded">
+            <p class="text-sm font-medium text-gray-700">Pending Withdrawal</p>
+            <p class="text-sm text-gray-600" id="pendingWithdrawalAmount"></p>
+            <p class="text-sm text-gray-600" id="pendingWithdrawalTime"></p>
+            <div class="flex gap-2 mt-2">
+              <button 
+                onclick="completeWithdrawal()"
+                class="text-sm bg-green-500 text-white rounded px-3 py-1 hover:bg-green-600"
+              >
+                Complete
+              </button>
+              <button 
+                onclick="handleCancelWithdrawal()"
+                class="text-sm bg-red-500 text-white rounded px-3 py-1 hover:bg-red-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+          <div class="text-sm text-gray-500 tabular-nums">Available: ${formatUSDC(state.balance)} USDC</div>
         </div>
-        <div class="text-sm text-gray-500 tabular-nums">Available: ${formatUSDC(state.balance)} USDC</div>
       </div>
     </div>
   `;
@@ -172,6 +193,35 @@ window.renderUI = function() {
 
   if (window.lucide) {
     lucide.createIcons();
+  }
+}
+
+// Update pending withdrawal UI
+window.updatePendingWithdrawalUI = function() {
+  const pendingWithdrawalElement = document.getElementById('pendingWithdrawal');
+  const pendingWithdrawalAmountElement = document.getElementById('pendingWithdrawalAmount');
+  const pendingWithdrawalTimeElement = document.getElementById('pendingWithdrawalTime');
+  
+  if (!pendingWithdrawalElement || !state.pendingWithdrawal) return;
+
+  if (state.pendingWithdrawal.isActive) {
+    const withdrawalTime = new Date(Number(state.pendingWithdrawal.requestTime) * 1000 + 3600000); // 1時間後
+    const now = new Date();
+    const canWithdraw = now >= withdrawalTime;
+
+    pendingWithdrawalElement.style.display = 'block';
+    pendingWithdrawalAmountElement.textContent = `Amount: ${formatUSDC(state.pendingWithdrawal.amount)} USDC`;
+    pendingWithdrawalTimeElement.textContent = canWithdraw 
+      ? 'Ready to withdraw' 
+      : `Available at: ${withdrawalTime.toLocaleString()}`;
+
+    const completeButton = pendingWithdrawalElement.querySelector('button[onclick="completeWithdrawal()"]');
+    if (completeButton) {
+      completeButton.disabled = !canWithdraw;
+      completeButton.classList.toggle('opacity-50', !canWithdraw);
+    }
+  } else {
+    pendingWithdrawalElement.style.display = 'none';
   }
 }
 

@@ -1,9 +1,3 @@
-// state.js の先頭に追加
-console.log('Loading state.js');
-if (typeof renderUI === 'undefined') {
-    console.log('Warning: renderUI is not defined when loading state.js');
-}
-
 // State management and updates
 window.updateUI = async function() {
   if (!currentAccount || !contract) return;

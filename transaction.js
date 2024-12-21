@@ -99,7 +99,7 @@ window.handleDeposit = async function() {
   }
 }
 
-// 引き出し処理
+// transaction.js の handleWithdraw 関数を修正
 window.handleWithdraw = async function() {
   if (!contract) return;
   
@@ -120,7 +120,7 @@ window.handleWithdraw = async function() {
     }
 
     // ガス代見積もり
-    const gasEstimate = await contract.methods.requestWithdrawal(amountWei).estimateGas({
+    const gasEstimate = await contract.methods.withdraw(amountWei).estimateGas({
       from: currentAccount
     });
     
@@ -135,25 +135,17 @@ window.handleWithdraw = async function() {
     const gasPrice = await getBaseGasPrice();
     showAlert('Processing withdrawal...', 'info');
     
-    // リクエストと引き出しを連続実行
-    const requestTx = await contract.methods.requestWithdrawal(amountWei)
+    // 即時引き出し
+    const withdrawTx = await contract.methods.withdraw(amountWei)
       .send({ 
         from: currentAccount,
         gasPrice: gasPrice
       });
 
-    if (requestTx.status) {
-      const withdrawTx = await contract.methods.withdraw()
-        .send({ 
-          from: currentAccount,
-          gasPrice: gasPrice
-        });
-
-      if (withdrawTx.status) {
-        showAlert('Withdrawal successful', 'success');
-        document.getElementById('withdrawAmount').value = '';
-        await updateUI();
-      }
+    if (withdrawTx.status) {
+      showAlert('Withdrawal successful', 'success');
+      document.getElementById('withdrawAmount').value = '';
+      await updateUI();
     }
   } catch (error) {
     handleTransactionError(error);

@@ -118,33 +118,29 @@ window.handleWithdraw = async function() {
       return;
     }
 
-    // ガス代見積もり
-    const gasEstimate = await contract.methods.withdraw().estimateGas({
-      from: currentAccount
-    });
-    
-    // ガスコストの確認
-    if (!await estimateTransactionCost(gasEstimate)) {
-      if (!confirm('Network fees are higher than usual. Do you want to proceed?')) {
-        setLoading(false);
-        return;
-      }
-    }
-
     const gasPrice = await getBaseGasPrice();
-    showAlert('Processing withdrawal...', 'info');
+    showAlert('Processing withdrawal request...', 'info');
     
-    // 即時引き出し
-    const withdrawTx = await contract.methods.withdraw()
+    // 1. まずリクエストを送信
+    const requestTx = await contract.methods.requestWithdrawal(amountWei)
       .send({ 
         from: currentAccount,
         gasPrice: gasPrice
       });
 
-    if (withdrawTx.status) {
-      showAlert('Withdrawal successful', 'success');
-      document.getElementById('withdrawAmount').value = '';
-      await updateUI();
+    if (requestTx.status) {
+      // 2. その後実際の引き出しを実行
+      const withdrawTx = await contract.methods.withdraw()
+        .send({ 
+          from: currentAccount,
+          gasPrice: gasPrice
+        });
+
+      if (withdrawTx.status) {
+        showAlert('Withdrawal successful', 'success');
+        document.getElementById('withdrawAmount').value = '';
+        await updateUI();
+      }
     }
   } catch (error) {
     handleTransactionError(error);

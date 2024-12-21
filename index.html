@@ -13,7 +13,7 @@
     
     <!-- External Dependencies -->
     <script src="https://cdn.tailwindcss.com?v=3.4.1"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.2/web3.min.js" integrity="sha512-nFoXwnw/HJ3sG+o3PuO+l9yf25tlxAJKjiWU3H7msFuA2ez2aA38qWHEeZ1z0OhHDqf2HSHWi8lcQ4lR6TJGA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.2/web3.min.js"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     
     <!-- Tailwind Configuration -->
@@ -119,11 +119,7 @@
             <div id="alertContainer" class="sticky top-0 z-10"></div>
             
             <!-- Main Content Area -->
-            <div id="mainContent" class="p-4 sm:p-6">
-              <div class="flex justify-center items-center">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-              </div>
-            </div>
+            <div id="mainContent" class="p-4 sm:p-6"></div>
           </div>
         </main>
         
@@ -150,7 +146,8 @@
 
     <!-- Application Scripts -->
     <script src="config.js"></script>
-    <script src="core.js"></script>
+    <script src="wallet.js"></script>
+    <script src="transaction.js"></script>
     <script src="ui.js"></script>
 
     <script>
@@ -162,49 +159,6 @@
         document.getElementById('errorBoundary').classList.remove('hidden');
         return false;
       };
-
-      // MetaMask event listeners
-      if (window.ethereum) {
-        window.ethereum.on('accountsChanged', function (accounts) {
-          if (accounts.length === 0) {
-            currentAccount = '';
-            state.isWalletConnected = false;
-            renderUI();
-          } else {
-            currentAccount = accounts[0];
-            updateUI();
-          }
-        });
-
-        window.ethereum.on('chainChanged', function() {
-          window.location.reload();
-        });
-
-        window.ethereum.on('disconnect', function() {
-          currentAccount = '';
-          state.isWalletConnected = false;
-          renderUI();
-        });
-
-        // Check network on load
-        ethereum.request({ method: 'eth_chainId' })
-          .then(chainId => {
-            if (chainId !== CHAIN_CONFIG.chainId) {
-              showAlert('Please switch to Base Network to continue', 'error');
-            }
-          })
-          .catch(console.error);
-
-      } else {
-        showAlert('Please install MetaMask to use this application', 'error');
-      }
-
-      // Initialize Lucide icons when DOM is ready
-      document.addEventListener('DOMContentLoaded', function() {
-        if (window.lucide) {
-          lucide.createIcons();
-        }
-      });
     </script>
   </body>
 </html>
